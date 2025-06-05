@@ -1,0 +1,34 @@
+article.shuffler {
+  position: relative;
+  place-items: center;
+  display: grid;
+  width: 100%;
+
+  & .vfx {
+    position: absolute;
+    opacity: 0.4;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    background: radial-gradient(circle, hsla(var(--clr-10), 1) 0%, hsla(var(--clr-10), 0) 60%);
+    filter: blur(60px);
+
+    animation: k-ping 6s ease 0.3s infinite alternate;
+  }
+
+  & .wrapper {
+    flex-direction: column;
+    position: relative;
+    display: flex;
+    gap: 1rem;
+  }
+
+  & .result {
+    font-size: clamp(8rem, 1.5rem + 8.5vw, 8.986rem);
+    font-family: "Poppins", sans-serif;
+    position: relative;
+    text-align: center;
+    font-weight: 700;
+  }
+}

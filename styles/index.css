@@ -1,0 +1,50 @@
+@import url(./theme.css);
+@import url(./typography.css);
+@import url(./keyframes.css);
+@import url(./classes.css);
+
+body {
+  background-color: hsl(var(--clr-60));
+  color: hsl(var(--clr-30));
+  scroll-margin: 90px;
+
+  padding: 0;
+  margin: 0;
+}
+
+nav {
+  all: unset;
+}
+
+main#root {
+  min-height: var(--min-website-height);
+  min-width: var(--min-website-width);
+  position: relative;
+  overflow-x: hidden;
+  height: 100dvh;
+
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+*::selection {
+  background-color: hsl(var(--clr-30));
+  color: hsl(var(--clr-60));
+}
+
+.no-sel::selection {
+  background-color: transparent;
+  color: inherit;
+}
+
+.bt:hover {
+  cursor: pointer;
+}
+
+.sticky {
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+}

@@ -1,0 +1,18 @@
+a.link {
+  all: unset;
+
+  transition: color ease 0.3s;
+  color: hsl(var(--clr-30));
+  border-radius: 100%;
+
+  display: grid;
+  &:active {
+    color: hsl(var(--clr-10));
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: hsl(var(--clr-10));
+    }
+  }
+}

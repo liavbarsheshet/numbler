@@ -1,0 +1,15 @@
+footer {
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 20px;
+  display: flex;
+
+  & small {
+    opacity: 0.7;
+  }
+
+  & small a {
+    display: inline-block !important;
+  }
+}

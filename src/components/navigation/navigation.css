@@ -1,0 +1,44 @@
+nav.navigation {
+  justify-content: center;
+  position: relative;
+  display: flex;
+  gap: 2rem;
+}
+
+a.nav-link {
+  transition: color ease 0.3s;
+  color: hsl(var(--clr-30));
+  text-decoration: none;
+  position: relative;
+  display: block;
+
+  &::after {
+    transition: opacity 0.3s ease, translate 0.3s ease, background-color 0.3s ease;
+    background-color: hsl(var(--clr-30));
+    left: calc(50% - 2.5px);
+    border-radius: 100%;
+    position: absolute;
+    content: "";
+    height: 5px;
+    width: 5px;
+    opacity: 0;
+    bottom: 0;
+  }
+
+  &:active {
+    color: hsl(var(--clr-10));
+  }
+
+  &:active::after {
+    background-color: hsl(var(--clr-10));
+    translate: 0 0.85rem;
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover::after {
+      translate: 0 0.85rem;
+      opacity: 1;
+    }
+  }
+}

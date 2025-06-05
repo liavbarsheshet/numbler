@@ -1,0 +1,66 @@
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.h-screen {
+  min-height: var(--min-website-height);
+  height: 100dvh;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.highlight {
+  color: hsl(var(--clr-10));
+}
+
+.t-center {
+  text-align: center;
+}
+
+.default {
+  cursor: default;
+}
+
+:root {
+  scroll-behavior: smooth;
+
+  --min-website-height: 600px;
+  --min-website-width: 320px;
+
+  --section-padding-v: 60px;
+  --section-padding-h: 60px;
+
+  @media (max-width: 1024px) {
+    --section-padding-v-dyn: 40px;
+    --section-padding-h: 40px;
+  }
+
+  @media (max-width: 480px) {
+    --section-padding-v-dyn: 20px;
+    --section-padding-h: 20px;
+  }
+}
+
+section,
+.section,
+.section-mini {
+  padding: var(--section-padding-v) var(--section-padding-h);
+  background-color: hsl(var(--clr-60));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.section-mini {
+  padding: calc(var(--section-padding-v) / 2) var(--section-padding-h);
+}
+
+section.secondary,
+.section-secondary {
+  background-color: hsl(var(--clr-60-neg));
+}

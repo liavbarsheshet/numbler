@@ -1,0 +1,27 @@
+.ripple-container {
+  border-radius: inherit;
+  position: absolute;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+
+.ripple {
+  animation: ripple-animation 0.8s linear forwards;
+  transition: opacity ease 0.3s;
+  border-radius: 100%;
+  position: absolute;
+  scale: 0;
+}
+
+.ripple[state="end"] {
+  opacity: 0;
+}
+
+@keyframes ripple-animation {
+  to {
+    scale: 4;
+  }
+}

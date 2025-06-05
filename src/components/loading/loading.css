@@ -1,0 +1,6 @@
+.loading-svg {
+  animation: k-rotate 0.7s ease 0s infinite forwards;
+  position: relative;
+  height: 1rem;
+  width: 1rem;
+}
