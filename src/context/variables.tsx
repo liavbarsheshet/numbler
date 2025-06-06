@@ -3,8 +3,10 @@ import React from "react";
 export type TVariables = {
   // Determines shuffler current state
   shufflerState: "initial" | "shuffling" | "shuffled" | "finished";
+  /** Is bgm muted? */
+  muteMusic: boolean;
   /** Is sound muted? */
-  mute: boolean;
+  muteSound: boolean;
 };
 
 export const VariablesContext = React.createContext<THook<TVariables> | null>(null);

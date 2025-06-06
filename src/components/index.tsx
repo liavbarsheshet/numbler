@@ -1,4 +1,5 @@
 export { default as MediaQuery } from "./mediaQuery.tsx";
+export { default as Conditional } from "./conditional";
 export { Navigation } from "./navigation";
 
 export * from "./number-input/index.tsx";

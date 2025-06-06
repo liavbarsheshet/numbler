@@ -19,14 +19,21 @@ article.shuffler {
 
   & .wrapper {
     flex-direction: column;
+    align-items: center;
     position: relative;
     display: flex;
     gap: 1rem;
+
+    & .number-input,
+    & button {
+      width: 280px;
+    }
   }
 
   & .result {
     font-size: clamp(8rem, 1.5rem + 8.5vw, 8.986rem);
     font-family: "Poppins", sans-serif;
+    transition: font-size ease 0.3s;
     position: relative;
     text-align: center;
     font-weight: 700;

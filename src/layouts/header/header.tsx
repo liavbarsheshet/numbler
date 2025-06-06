@@ -1,15 +1,19 @@
-import { MdVolumeUp, MdVolumeOff, MdRestartAlt } from "react-icons/md";
+import { MdVolumeUp, MdVolumeOff, MdRestartAlt, MdOutlineMusicNote, MdOutlineMusicOff } from "react-icons/md";
 import { useVariables } from "@/hooks";
 import { Link } from "@/components";
 
 import "./header.css";
 
 export default function Header() {
-  const [{ mute }, setVariables] = useVariables();
+  const [{ muteSound, muteMusic }, setVariables] = useVariables();
 
-  const handleMute = () =>
+  const handleMuteSound = () =>
     setVariables((prev) => {
-      return { ...prev, mute: !prev.mute };
+      return { ...prev, muteSound: !prev.muteSound };
+    });
+  const handleMuteMusic = () =>
+    setVariables((prev) => {
+      return { ...prev, muteMusic: !prev.muteMusic };
     });
 
   return (
@@ -19,8 +23,11 @@ export default function Header() {
         <Link>
           <MdRestartAlt className="size-l" />
         </Link>
-        <Link onClick={handleMute}>
-          {mute ? <MdVolumeOff className="size-l" /> : <MdVolumeUp className="size-l" />}
+        <Link onClick={handleMuteSound}>
+          {muteSound ? <MdVolumeOff className="size-l" /> : <MdVolumeUp className="size-l" />}
+        </Link>
+        <Link onClick={handleMuteMusic}>
+          {muteMusic ? <MdOutlineMusicOff className="size-l" /> : <MdOutlineMusicNote className="size-l" />}
         </Link>
       </nav>
     </header>

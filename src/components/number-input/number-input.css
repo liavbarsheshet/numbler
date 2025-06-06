@@ -1,0 +1,25 @@
+.number-input-wrapper {
+  & .number-input {
+    transition: border-color ease 0.3s;
+    font-family: "Poppins", sans-serif;
+    border: none;
+    border-bottom: 0.1rem solid hsl(var(--clr-30));
+    border-radius: var(--dim-border-radius);
+    color: hsl(var(--clr-30));
+    background: transparent;
+    box-sizing: border-box;
+    text-align: center;
+    outline: none;
+    padding: 1rem;
+  }
+
+  & .number-input:focus {
+    border-color: hsl(var(--clr-10));
+  }
+
+  & label {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}

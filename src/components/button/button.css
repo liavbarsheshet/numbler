@@ -10,6 +10,7 @@
   transition: outline ease 0.3s, background-color ease 0.3s, border ease 0.3s, border-color 0.3s ease, color ease 0.3s;
   border-radius: var(--dim-border-radius);
   justify-content: center;
+  box-sizing: border-box;
   align-items: center;
   position: relative;
   font-weight: 400;
