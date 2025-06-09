@@ -1,0 +1,30 @@
+article.agreement {
+  transition: opacity 0.5s ease;
+  place-items: center;
+  position: absolute;
+  display: grid;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+
+  & section {
+    box-sizing: border-box;
+    place-items: center;
+    position: relative;
+    text-align: center;
+    display: grid;
+    padding: 20px;
+
+    & button {
+      margin-top: 2rem;
+    }
+  }
+
+  &::before {
+    background: hsla(var(--clr-60), 0.95);
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    content: "";
+  }
+}
