@@ -3,44 +3,154 @@ import { AudioContext } from "@/context";
 import { useVariables } from "@/hooks";
 import React from "react";
 
-const SOUND_FILES = {
-  click: { src: "click.opus", vol: 0.5 },
-  yay: { src: "yay.opus", vol: 0.04 },
+interface SoundConfig {
+  poolSize?: number; // Number of audio instances to pre-create for overlapping sounds
+  src: string;
+  vol: number;
+}
+
+const SOUND_FILES: Record<TSoundNames, SoundConfig> = {
+  gameover: { src: "gameover.opus", vol: 0.2, poolSize: 1 },
+  click: { src: "click.opus", vol: 0.5, poolSize: 5 },
+  yay: { src: "yay.opus", vol: 0.04, poolSize: 3 },
 };
+
+interface AudioPool {
+  instances: HTMLAudioElement[];
+  currentIndex: number;
+  config: SoundConfig;
+}
 
 const AudioProvider: React.FC<IProvidersProps> = ({ children }) => {
   const [{ muteMusic, muteSound, agreed }] = useVariables();
   const musicRef = React.useRef<HTMLAudioElement>(null);
+  const audioPoolsRef = React.useRef<Record<TSoundNames, AudioPool>>({} as Record<TSoundNames, AudioPool>);
+  const isInitializedRef = React.useRef(false);
 
+  // Initialize audio pools
+  const initializeAudioPools = React.useCallback(() => {
+    if (isInitializedRef.current) return;
+
+    Object.entries(SOUND_FILES).forEach(([soundName, config]) => {
+      const poolSize = config.poolSize || 3;
+      const instances: HTMLAudioElement[] = [];
+
+      for (let i = 0; i < poolSize; i++) {
+        const audio = new Audio(config.src);
+        audio.preload = "auto";
+        audio.volume = config.vol;
+
+        // Pre-load the audio
+        audio.load();
+
+        // Add error handling
+        audio.addEventListener("error", (e) => {
+          console.warn(`Failed to load audio: ${config.src}`, e);
+        });
+
+        instances.push(audio);
+      }
+
+      audioPoolsRef.current[soundName as TSoundNames] = {
+        instances,
+        currentIndex: 0,
+        config,
+      };
+    });
+
+    isInitializedRef.current = true;
+  }, []);
+
+  // Initialize pools when component mounts and user has agreed
+  React.useEffect(() => {
+    if (agreed && !isInitializedRef.current) {
+      initializeAudioPools();
+    }
+  }, [agreed, initializeAudioPools]);
+
+  // Handle background music
   React.useEffect(() => {
     const music = musicRef.current;
-
     if (!music || !agreed) return;
 
     music.volume = muteMusic ? 0 : 0.1;
 
-    music.play().catch(() => {});
-  }, [muteMusic, muteSound, agreed]);
+    if (!muteMusic) {
+      music.play().catch((error) => {
+        console.warn("Failed to play background music:", error);
+      });
+    } else {
+      music.pause();
+    }
+  }, [muteMusic, agreed]);
 
-  const playClickSound = (name: TSoundNames, pitch: number) => {
-    if (muteSound) return;
+  // Optimized sound playing function
+  const playSound = React.useCallback(
+    (name: TSoundNames, pitch: number = 1) => {
+      if (muteSound || !agreed || !isInitializedRef.current) return;
 
-    const newAudio = new Audio(SOUND_FILES[name].src);
+      const pool = audioPoolsRef.current[name];
+      if (!pool) {
+        console.warn(`Audio pool not found for sound: ${name}`);
+        return;
+      }
 
-    newAudio.volume = muteSound ? 0 : SOUND_FILES[name].vol;
-    newAudio.playbackRate = pitch;
+      // Get the next available audio instance from the pool
+      const audio = pool.instances[pool.currentIndex];
 
-    newAudio.currentTime = 0;
+      // Update the pool index for next use (circular)
+      pool.currentIndex = (pool.currentIndex + 1) % pool.instances.length;
 
-    newAudio.play().catch(() => {});
-  };
+      // Configure and play the audio
+      try {
+        audio.currentTime = 0; // Reset to beginning
+        audio.volume = pool.config.vol;
+        audio.playbackRate = pitch;
 
-  // Render provider with current device size
+        // Play the audio
+        const playPromise = audio.play();
+
+        // Handle play promise (modern browsers return a promise)
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.warn(`Failed to play sound: ${name}`, error);
+          });
+        }
+      } catch (error) {
+        console.warn(`Error playing sound: ${name}`, error);
+      }
+    },
+    [muteSound, agreed]
+  );
+
+  // Memoized context value to prevent unnecessary re-renders
+  const contextValue = React.useMemo(() => playSound, [playSound]);
+
+  // Cleanup function
+  React.useEffect(() => {
+    return () => {
+      // Clean up audio pools on unmount
+      Object.values(audioPoolsRef.current).forEach((pool) => {
+        pool.instances.forEach((audio) => {
+          audio.pause();
+          audio.currentTime = 0;
+          // Remove event listeners to prevent memory leaks
+          audio.removeEventListener("error", () => {});
+        });
+      });
+    };
+  }, []);
+
   return (
-    <AudioContext.Provider value={playClickSound}>
-      <audio className="d-none" src="bgm.opus" ref={musicRef} preload="auto" loop></audio>
-      <audio className="d-none" src="click.opus" preload="auto"></audio>
-      <audio className="d-none" src="yay.opus" preload="auto"></audio>
+    <AudioContext.Provider value={contextValue}>
+      <audio
+        className="d-none"
+        src="bgm.opus"
+        ref={musicRef}
+        preload="auto"
+        loop
+        onError={(e) => console.warn("Failed to load background music:", e)}
+      />
       {children}
     </AudioContext.Provider>
   );

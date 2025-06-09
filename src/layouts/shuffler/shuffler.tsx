@@ -1,173 +1,209 @@
 import { Button, Conditional, NumberInput } from "@/components";
-import { useAudio, useVariables } from "@/hooks";
+import { useAudio, useVariables, useConfetti } from "@/hooks";
+import type { TVariables } from "@/context";
 import { randomNumber } from "@/util";
+import clsx from "clsx";
+
 import React from "react";
 
 import "./shuffler.css";
 
-const buttonText = {
+const BUTTON_TEXT: Record<TVariables["shufflerState"], string> = {
   initial: "BEGIN",
   shuffling: "SHUFFLING...",
   shuffled: "NEXT NUMBER",
   finished: "PLAY AGAIN",
-};
+} as const;
 
 const MAX_SAFE_SIZE = 16_777_216;
 const SLOWEST_DELAY_MS = 300;
 const MAX_NUM_DISPLAY = 50;
 const MIN_DELAY_MS = 100;
 
+// Memoized delay calculation function
+const calculateDelay = (n: number, maxDisplays: number): number => {
+  if (n <= maxDisplays / 2) return MIN_DELAY_MS;
+
+  const halfMax = maxDisplays / 2.2;
+  const factor = (SLOWEST_DELAY_MS - MIN_DELAY_MS) / halfMax ** 2;
+  return factor * (n - halfMax) ** 2 + MIN_DELAY_MS;
+};
+
 export default function Shuffler() {
   const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const showCaseRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const [useMemory, setMemory] = React.useState<number[] | { [key: string]: boolean }>([]);
-  const [{ shufflerState, agreed, distinctMode }, setVariables] = useVariables();
-  const [useCounter, setCounter] = React.useState<number>(0);
-  const [useSize, setSize] = React.useState(30);
+  // Local state for shuffler-specific data
+  const [memory, setMemory] = React.useState<number[] | Record<string, boolean>>([]);
+  const [counter, setCounter] = React.useState<number>(0);
+  const [size, setSize] = React.useState<number>(30);
 
+  // External state
+  const [{ shufflerState, agreed, distinctMode }, setVariables] = useVariables();
   const playSound = useAudio();
 
-  const handleClick = () => {
-    if (!agreed) return;
+  const fire = useConfetti();
 
-    if (shufflerState === "initial") {
-      const input = inputRef.current;
+  // Memoized values
+  const maxDisplays = React.useMemo(() => Math.trunc(Math.min(MAX_NUM_DISPLAY, size)), [size]);
+  const isMemoryArray = React.useMemo(() => Array.isArray(memory), [memory]);
+  const isFinished = React.useMemo(() => counter + 1 === size, [counter, size]);
 
-      if (!input) return;
-
-      const value = input.value.trim();
-
-      if (!value) return;
-
-      const size = parseInt(value, 10);
-
-      if (isNaN(size) || size <= 0) return;
-
-      setMemory(size > MAX_SAFE_SIZE ? {} : new Array(size));
-      setSize(size);
-      setCounter(0);
-
-      // Change State
-      setVariables((prev) => ({ ...prev, shufflerState: "shuffling" }));
-      return;
-    }
-
-    if (shufflerState === "shuffled") {
-      setVariables((prev) => ({ ...prev, shufflerState: "shuffling" }));
-      return;
-    }
-
-    if (shufflerState === "finished") {
-      setVariables((prev) => ({ ...prev, shufflerState: "initial" }));
-      return;
-    }
-  };
-
+  // Cleanup timeout on unmount
   React.useEffect(() => {
-    if (shufflerState !== "shuffling" || timeoutRef.current) return;
-
-    const showCase = showCaseRef.current;
-
-    if (!showCase) return;
-
-    const maxDisplays = Math.trunc(Math.min(MAX_NUM_DISPLAY, useSize));
-
-    // Function to calculate the shuffle animation
-    const fn = (n: number) =>
-      n > maxDisplays / 2
-        ? ((SLOWEST_DELAY_MS - MIN_DELAY_MS) / (maxDisplays / 2) ** 2) * (n - maxDisplays / 2) ** 2 + MIN_DELAY_MS
-        : MIN_DELAY_MS;
-
-    const selectRandomNumber = () => {
-      if (Array.isArray(useMemory)) {
-        const randomIndex = randomNumber(0, useMemory.length - 1);
-        const randomValue = useMemory[randomIndex] ?? randomIndex + 1;
-
-        if (distinctMode) {
-          setMemory((prev) => {
-            if (!Array.isArray(prev)) return prev;
-
-            const newMemory = [...prev];
-            if (!newMemory[randomIndex]) newMemory[randomIndex] = randomValue;
-            newMemory[newMemory.length - 1] = newMemory[randomIndex];
-            newMemory.pop();
-
-            return newMemory;
-          });
-          setCounter((prev) => prev + 1);
-        }
-
-        return randomValue;
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
+    };
+  }, []);
 
-      let randomValue = randomNumber(1, useSize);
-
-      while (useMemory[`${randomValue}`]) randomValue = randomNumber(1, useSize);
+  // Memoized random number selector
+  const selectRandomNumber = React.useCallback((): number => {
+    if (isMemoryArray) {
+      const memoryArray = memory as number[];
+      const randomIndex = randomNumber(0, memoryArray.length);
+      const randomValue = memoryArray[randomIndex] ?? randomIndex + 1;
 
       if (distinctMode) {
         setMemory((prev) => {
-          if (Array.isArray(prev)) return prev;
-
-          const newMemory = { ...prev };
-          newMemory[`${randomValue}`] = true;
+          if (!Array.isArray(prev)) return prev;
+          const newMemory = [...prev];
+          newMemory[randomIndex] = newMemory[newMemory.length - 1] ?? newMemory.length;
+          newMemory.pop();
           return newMemory;
         });
         setCounter((prev) => prev + 1);
       }
 
       return randomValue;
-    };
+    }
 
-    const handleTimeout = (n: number) => {
-      if (n < maxDisplays) {
-        showCase.innerText = `${randomNumber(1, useSize)}`;
-        playSound("click", 1 + (1 - n / maxDisplays));
-        // Play click sound with decreasing volume
-        timeoutRef.current = setTimeout(() => handleTimeout(n + 1), fn(n + 1));
+    const memoryObject = memory as Record<string, boolean>;
+    let randomValue: number;
+
+    // More efficient random selection for object-based memory
+    do {
+      randomValue = randomNumber(0, size) + 1;
+    } while (memoryObject[randomValue.toString()]);
+
+    if (distinctMode) {
+      setMemory((prev) => {
+        if (Array.isArray(prev)) return prev;
+        return { ...prev, [randomValue.toString()]: true };
+      });
+      setCounter((prev) => prev + 1);
+    }
+
+    return randomValue;
+  }, [memory, size, distinctMode, isMemoryArray]);
+
+  // Memoized timeout handler
+  const createTimeoutHandler = React.useCallback(() => {
+    let currentIteration = 0;
+
+    const handleTimeout = (): void => {
+      const showCase = showCaseRef.current;
+      if (!showCase) return;
+
+      if (currentIteration < maxDisplays) {
+        // Animation phase
+        const someNumber = (randomNumber(0, size) + 1).toLocaleString();
+        showCase.setAttribute("data-length", someNumber.length.toString());
+        showCase.innerText = someNumber;
+
+        playSound("click", 1 + (1 - currentIteration / maxDisplays));
+
+        currentIteration++;
+        timeoutRef.current = setTimeout(handleTimeout, calculateDelay(currentIteration, maxDisplays));
         return;
       }
 
-      // Show the number
-      showCase.innerText = `${selectRandomNumber()}`;
-      playSound("yay", 1);
+      // Final result phase
+      const selectedNumber = selectRandomNumber().toLocaleString();
+      showCase.setAttribute("data-length", selectedNumber.length.toString());
+      showCase.innerText = selectedNumber;
+      fire();
 
-      if (useCounter + 1 === useSize) {
-        setVariables((prev) => ({ ...prev, shufflerState: "finished" }));
-        return;
-      }
+      if (isFinished) playSound("gameover", 1);
+      else playSound("yay", 1);
 
-      setVariables((prev) => ({ ...prev, shufflerState: "shuffled" }));
+      // Update state based on completion
+      setVariables((prev) => ({
+        ...prev,
+        shufflerState: isFinished ? "finished" : "shuffled",
+      }));
 
       timeoutRef.current = null;
     };
 
-    timeoutRef.current = setTimeout(() => handleTimeout(0), fn(0));
-  }, [shufflerState, useMemory, useSize, useCounter, setVariables, playSound, distinctMode]);
+    return handleTimeout;
+  }, [maxDisplays, size, playSound, selectRandomNumber, setVariables, isFinished]);
 
+  // Handle shuffling effect
   React.useEffect(() => {
-    if (!timeoutRef.current) return;
+    if (shufflerState !== "shuffling" || timeoutRef.current) return;
 
-    return () => {
-      clearTimeout(timeoutRef.current ?? undefined);
-      timeoutRef.current = null;
-    };
-  }, []);
+    const timeoutHandler = createTimeoutHandler();
+    timeoutRef.current = setTimeout(timeoutHandler, calculateDelay(0, maxDisplays));
+  }, [shufflerState, createTimeoutHandler, maxDisplays]);
+
+  // Memoized click handler
+  const handleClick = React.useCallback(() => {
+    if (!agreed) return;
+
+    switch (shufflerState) {
+      case "initial": {
+        const input = inputRef.current;
+        if (!input) return;
+
+        const value = input.value.trim();
+        if (!value) return;
+
+        const inputSize = parseInt(value, 10);
+        if (isNaN(inputSize) || inputSize <= 0) return;
+
+        // Initialize memory structure based on size
+        const newMemory = inputSize > MAX_SAFE_SIZE ? {} : new Array(inputSize);
+        setMemory(newMemory);
+        setSize(inputSize);
+        setCounter(0);
+
+        setVariables((prev) => ({ ...prev, shufflerState: "shuffling" }));
+        break;
+      }
+      case "shuffled":
+        setVariables((prev) => ({ ...prev, shufflerState: "shuffling" }));
+        break;
+      case "finished":
+        setVariables((prev) => ({ ...prev, shufflerState: "initial" }));
+        break;
+    }
+  }, [agreed, shufflerState, setVariables]);
 
   return (
     <article className="shuffler">
       <div className="vfx"></div>
       <div className="wrapper">
-        <Conditional condition={shufflerState === "initial"}>
-          <NumberInput ref={inputRef} maxLength={11} defaultValue={30} />
-        </Conditional>
-        <Conditional condition={shufflerState !== "initial"}>
-          <div ref={showCaseRef} className="result default no-sel"></div>
-        </Conditional>
+        <div className="show-case-container" data-is-initial={shufflerState === "initial"}>
+          <Conditional condition={shufflerState === "initial"}>
+            <NumberInput ref={inputRef} maxLength={11} defaultValue={30} />
+          </Conditional>
+          <Conditional condition={shufflerState !== "initial"}>
+            <div
+              className={clsx("result default no-sel", shufflerState === "shuffling" ? "ping" : undefined)}
+              ref={showCaseRef}
+            ></div>
+          </Conditional>
+        </div>
+
         <Button
-          loadingLabel={buttonText[shufflerState]}
-          text={buttonText[shufflerState]}
+          loadingLabel={BUTTON_TEXT[shufflerState]}
+          loading={shufflerState === "shuffling"}
+          text={BUTTON_TEXT[shufflerState]}
           onClick={handleClick}
           size="full"
         />

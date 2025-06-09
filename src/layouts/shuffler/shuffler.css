@@ -30,12 +30,69 @@ article.shuffler {
     }
   }
 
-  & .result {
-    font-size: clamp(8rem, 1.5rem + 8.5vw, 8.986rem);
-    font-family: "Poppins", sans-serif;
-    transition: font-size ease 0.3s;
+  & .show-case-container {
+    transition: height ease 0.3s;
+    place-items: center;
     position: relative;
+
+    display: grid;
+    height: 100px;
+    width: 100%;
+
+    &[data-is-initial="false"] {
+      height: 150px;
+    }
+  }
+
+  & .confetti {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+  }
+
+  & .result {
+    font-size: clamp(8rem, 1.5rem + 8vw, 8.5rem);
+    font-family: "Poppins", sans-serif;
+
+    translate: -50% -50%;
+    position: absolute;
+    width: 100%;
+    left: 50%;
+    top: 50%;
     text-align: center;
     font-weight: 700;
+
+    &[data-length="5"] {
+      font-size: clamp(6.5rem, 1.5rem + 6.5vw, 6.5rem);
+    }
+
+    &[data-length="6"] {
+      font-size: clamp(5rem, 1.5rem + 5vw, 5rem);
+    }
+
+    &[data-length="7"] {
+      font-size: clamp(4rem, 1.5rem + 4vw, 4rem);
+    }
+
+    &[data-length="9"] {
+      font-size: clamp(3.4rem, 1.5rem + 3.4vw, 3.4rem);
+    }
+
+    &[data-length="10"] {
+      font-size: clamp(3rem, 1.5rem + 3vw, 3rem);
+    }
+
+    &[data-length="11"] {
+      font-size: clamp(2.7rem, 1.5rem + 2.7vw, 2.7rem);
+    }
+
+    &[data-length="13"] {
+      font-size: clamp(2.4rem, 1.5rem + 2.4vw, 2.4rem);
+    }
+    &[data-length="14"] {
+      font-size: clamp(2.2rem, 1.5rem + 2.2vw, 2.2rem);
+    }
   }
 }

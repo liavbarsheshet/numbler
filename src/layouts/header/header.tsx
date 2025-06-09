@@ -6,12 +6,14 @@ import { Link } from "@/components";
 import "./header.css";
 
 export default function Header() {
-  const [{ muteSound, muteMusic, distinctMode }, setVariables] = useVariables();
+  const [{ muteSound, muteMusic, distinctMode, shufflerState }, setVariables] = useVariables();
 
-  const handleMuteSound = () =>
+  const handleMuteSound = () => {
+    if (shufflerState === "shuffling") return;
     setVariables((prev) => {
       return { ...prev, muteSound: !prev.muteSound };
     });
+  };
 
   const handleMuteMusic = () =>
     setVariables((prev) => {
@@ -19,8 +21,18 @@ export default function Header() {
     });
 
   const handleDistinctMode = () => {
+    if (shufflerState === "shuffling") return;
+
     setVariables((prev) => {
       return { ...prev, distinctMode: !prev.distinctMode };
+    });
+  };
+
+  const handleReset = () => {
+    if (shufflerState === "shuffling") return;
+
+    setVariables((prev) => {
+      return { ...prev, shufflerState: "initial" };
     });
   };
 
@@ -28,7 +40,7 @@ export default function Header() {
     <header className="default no-sel">
       <h4>NUMBLER</h4>
       <nav>
-        <Link>
+        <Link onClick={handleReset}>
           <MdRestartAlt className="size-l" />
         </Link>
         <Link onClick={handleDistinctMode}>

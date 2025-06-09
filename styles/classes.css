@@ -31,6 +31,10 @@
   display: none;
 }
 
+.ping {
+  animation: k-ping 0.2s ease 0s infinite alternate;
+}
+
 :root {
   scroll-behavior: smooth;
 
