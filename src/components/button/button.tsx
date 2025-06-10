@@ -25,6 +25,9 @@ type ButtonProps = {
   active?: boolean;
   /** Text */
   text?: string;
+
+  /** Reference */
+  ref?: React.Ref<HTMLButtonElement>;
 } & React.HTMLAttributes<HTMLButtonElement>;
 
 export default function Button({

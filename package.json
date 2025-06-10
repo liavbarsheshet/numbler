@@ -1,12 +1,45 @@
 {
   "name": "numbler",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "type": "module",
+  "description": "Numbler is a fun and elegant random number generator with a twist — toggle unique mode to avoid repeats, enjoy smooth design and music, and rest easy knowing it doesn't track anything. Just numbers, your way.",
+  "keywords": [
+    "NUMBLER",
+    "numbler",
+    "Numbler",
+    "random number",
+    "generator",
+    "unique number generator",
+    "non-repeating numbers",
+    "number picker",
+    "generate random number",
+    "number randomizer",
+    "online number tool",
+    "fun number generator",
+    "random number app",
+    "number generator with sound",
+    "elegant web app",
+    "number game",
+    "number lottery tool",
+    "interactive number generator",
+    "educational tool numbers"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Liav Barsheshet",
+    "email": "liavbarsheshet@gmail.com",
+    "url": "https://github.com/liavbarsheshet"
+  },
+  "homepage": "https://github.com/liavbarsheshet/numbler#readme",
+  "repository": {
+    "url": "https://github.com/liavbarsheshet/numbler.git",
+    "type": "git"
   },
   "dependencies": {
     "clsx": "^2.1.1",

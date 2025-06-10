@@ -141,7 +141,7 @@ export default function Shuffler() {
     };
 
     return handleTimeout;
-  }, [maxDisplays, size, playSound, selectRandomNumber, setVariables, isFinished]);
+  }, [maxDisplays, size, playSound, selectRandomNumber, setVariables, isFinished, fire]);
 
   // Handle shuffling effect
   React.useEffect(() => {
@@ -184,13 +184,25 @@ export default function Shuffler() {
     }
   }, [agreed, shufflerState, setVariables]);
 
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const button = buttonRef.current;
+    const input = inputRef.current;
+
+    if (e.key !== "Enter" || !button || !input) return;
+
+    input.blur();
+    button.click();
+  };
+
   return (
     <article className="shuffler">
       <div className="vfx"></div>
       <div className="wrapper">
         <div className="show-case-container" data-is-initial={shufflerState === "initial"}>
           <Conditional condition={shufflerState === "initial"}>
-            <NumberInput ref={inputRef} maxLength={11} defaultValue={30} />
+            <NumberInput ref={inputRef} onKeyUp={handleEnter} maxLength={11} defaultValue={30} />
           </Conditional>
           <Conditional condition={shufflerState !== "initial"}>
             <div
@@ -205,6 +217,7 @@ export default function Shuffler() {
           loading={shufflerState === "shuffling"}
           text={BUTTON_TEXT[shufflerState]}
           onClick={handleClick}
+          ref={buttonRef}
           size="full"
         />
       </div>
