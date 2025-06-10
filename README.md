@@ -20,6 +20,12 @@ A fun and elegant random number generator with a twist — toggle unique mode to
 
 ---
 
+## 🌐 Experience Numbler
+
+Try the app live at https://numbler.liavbarsheshet.com — no downloads, no tracking, just fun with numbers.
+
+---
+
 ## 📂 Install Locally
 
 1. Clone the repo:
