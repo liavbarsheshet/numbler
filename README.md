@@ -9,7 +9,6 @@ A fun and elegant random number generator with a twist — toggle unique mode to
 
 <img src="https://github.com/liavbarsheshet/numbler/blob/main/assets/screenshot.jpg?raw=true" alt="Screenshot" />
 
----
 
 ## 🚀 Features
 
@@ -18,13 +17,11 @@ A fun and elegant random number generator with a twist — toggle unique mode to
 - 🎨 Minimal, clean, elegant and responsive UI.
 - ⚡ Built for speed and simplicity — no clutter.
 
----
 
 ## 🌐 Experience Numbler
 
 Try the app live at https://numbler.liavbarsheshet.com — no downloads, no tracking, just fun with numbers.
 
----
 
 ## 📂 Install Locally
 
@@ -52,7 +49,6 @@ Try the app live at https://numbler.liavbarsheshet.com — no downloads, no trac
    ./dist/index.html
    ```
 
----
 
 ## 🛠️ Toolbar
 
@@ -65,13 +61,11 @@ Try the app live at https://numbler.liavbarsheshet.com — no downloads, no trac
 3. Mutes or unmutes sound effects.
 4. Turns background music on or off.
 
----
 
 ## Author
 
 [Liav Barsheshet, LBDevelopments](https://github.com/liavbarsheshet)
 
----
 
 ## License
 
