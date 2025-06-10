@@ -1,5 +1,5 @@
 import { useVariables } from "@/hooks";
-import { Button } from "@/components";
+import { Button, Link } from "@/components";
 
 import React from "react";
 
@@ -40,22 +40,22 @@ export default function Agreement() {
   return (
     <article ref={containerRef} className="agreement">
       <section>
-        <h4 className="black">Welcome to NUMBLER 🎲</h4>
+        <h4 className="black">Hey it's Numbler 🎲</h4>
         <p>
-          A fun web application for generating random numbers.
+          A fun and elegant web application for generating random numbers.
           <br />
           <br />
-          We do <strong>not use cookies</strong>, do <strong>not store any personal data</strong>, and we do{" "}
-          <strong>not track you</strong> in any way.
+          It <strong>doesn’t</strong> use cookies, collect personal data, or track you in any way.
           <br />
           <br />
-          <strong>Please note:</strong> This site plays short sound effects (like clicks) during number shuffling.
+          To enjoy the full experience, please grant audio permission by clicking below.
           <br />
           <br />
-          For the best experience, you'll need to grant audio permission by clicking below.
-          <br />
-          <br />
-          Hope you enjoy using NUMBLER!
+          For more information, visit our {""}
+          <Link href="https://github.com/liavbarsheshet/numbler" target="_blank" rel="noopener noreferrer">
+            Github repo
+          </Link>
+          .
         </p>
         <Button text="Understood" onClick={handleClick} size="large" />
       </section>
