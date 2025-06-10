@@ -5,16 +5,18 @@
 	<br>
 </h1>
 
-A simple and fun random number generator web app. Set your maximum number, press the **Next Number** button, and get random results — perfect for lottery draws, games, or just messing around with numbers.
+A fun and elegant random number generator with a twist — toggle unique mode to avoid repeats, enjoy smooth design and music, and rest easy knowing it doesn't track anything. Just numbers, your way.
+
+<img src="https://raw.githubusercontent.com/liavbarsheshet/numbler/refs/heads/main/assets/screenshot.png" alt="Screenshot" />
 
 ---
 
 ## 🚀 Features
 
-- 🔢 Set a custom maximum number
-- 🎰 Instantly generate random numbers
-- 🎨 Minimal, clean, and responsive UI
-- ⚡ Built for speed and simplicity — no clutter
+- 🔢 Set a custom maximum number.
+- 🎰 Instantly generate random numbers.
+- 🎨 Minimal, clean, elegant and responsive UI.
+- ⚡ Built for speed and simplicity — no clutter.
 
 ---
 
